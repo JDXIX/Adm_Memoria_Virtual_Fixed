@@ -1,6 +1,4 @@
-Aquí tienes un **README.md completo, detallado y listo para pegar** en tu repo. Incluye **todo**: objetivo, alcance, arquitectura MVC, módulos, flujo, algoritmos, UI, ejecución, estructura, troubleshooting, y mejoras futuras (incluida persistencia JSON).
 
----
 
 ```md
 # 🖥️ Administrador de Memoria Virtual (Visual) — Patrón MVC (PyQt6)
