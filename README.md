@@ -1,7 +1,3 @@
-
----
-
-```md
 # 🖥️ Administrador de Memoria Virtual (Visual) — Patrón MVC (PyQt6)
 
 Simulador **visual e interactivo** para comprender cómo funcionan la **memoria física**, **memoria virtual**, la **paginación** y los **algoritmos de reemplazo de páginas** en un sistema operativo.
@@ -99,26 +95,25 @@ Interfaz gráfica (PyQt6):
 ## 📁 Estructura del repositorio
 
 ```
-
 ADM_MEMORIA_VIRTUAL_FIXED/
 │
 ├─ controllers/
-│  ├─ **init**.py
+│  ├─ __init__.py
 │  └─ main_controller.py         # Controlador principal (orquesta el sistema)
 │
 ├─ models/
-│  ├─ **init**.py
+│  ├─ __init__.py
 │  ├─ memoria_model.py           # Memoria física: marcos, páginas (bits R/M)
 │  ├─ proceso_model.py           # Proceso + tabla de páginas (entradas)
 │  ├─ algoritmos_model.py        # FIFO, LRU, NRU, CLOCK, OPT
 │  └─ simulador_model.py         # Motor de simulación + eventos (HIT/FAULT/REEMPLAZO)
 │
 ├─ utils/
-│  ├─ **init**.py
+│  ├─ __init__.py
 │  └─ helpers.py                 # Funciones auxiliares (colores, formateo)
 │
 ├─ views/
-│  ├─ **init**.py
+│  ├─ __init__.py
 │  ├─ main_view.py               # Ventana principal (ensambla subvistas)
 │  ├─ memoria_view.py            # Vista RAM: MarcoWidget + animación
 │  ├─ tabla_view.py              # Vista tabla de páginas
@@ -129,8 +124,7 @@ ADM_MEMORIA_VIRTUAL_FIXED/
 ├─ requirements.txt
 ├─ README.md
 └─ main.py                       # Punto de entrada
-
-````
+```
 
 ---
 
@@ -139,24 +133,21 @@ ADM_MEMORIA_VIRTUAL_FIXED/
 ### 1) Crear entorno virtual (recomendado)
 ```bash
 python -m venv venv
-````
+```
 
 ### 2) Activar entorno virtual
 
 **Windows (PowerShell):**
-
 ```bash
 venv\Scripts\Activate.ps1
 ```
 
 **Windows (CMD):**
-
 ```bash
 venv\Scripts\activate.bat
 ```
 
 **Linux/Mac:**
-
 ```bash
 source venv/bin/activate
 ```
@@ -189,7 +180,7 @@ En el panel superior:
 
 ### ✅ Crear/ingresar secuencia de accesos
 
-En “Simulación y Estadísticas”:
+En "Simulación y Estadísticas":
 
 * **Páginas virtuales:** define el tamaño de memoria virtual del proceso.
 * **Secuencia:** lista de accesos, por ejemplo:
@@ -248,7 +239,7 @@ En “Simulación y Estadísticas”:
 4. Si no hay marco libre:
 
    * el algoritmo (FIFO/LRU/NRU/CLOCK/OPT) selecciona **marco víctima**
-   * se “expulsa” la página antigua (actualiza tabla de páginas)
+   * se "expulsa" la página antigua (actualiza tabla de páginas)
    * se carga la nueva página en el marco elegido
 5. Se genera un **EventoSimulacion** y se actualiza la vista.
 
@@ -282,7 +273,7 @@ Clasifica páginas por bits:
 
 ### CLOCK
 
-Simula un “reloj” con puntero circular:
+Simula un "reloj" con puntero circular:
 
 * Si R=0 → reemplazar
 * Si R=1 → se limpia R y se avanza
@@ -291,7 +282,7 @@ Simula un “reloj” con puntero circular:
 
 Reemplaza la página cuyo **próximo uso** será el más lejano (o nunca).
 
-* Necesita la secuencia futura para estimar “distancia”.
+* Necesita la secuencia futura para estimar "distancia".
 
 ---
 
@@ -316,7 +307,7 @@ Cada evento incluye:
 
 ## 🧪 Troubleshooting (errores comunes)
 
-### ❗ “No module named PyQt6”
+### ❗ "No module named PyQt6"
 
 Instala PyQt6:
 
@@ -350,7 +341,7 @@ Verifica que `MainController` conecte señales con `conectar_señales()` (ya est
 
 * Guardar: marcos, algoritmo, páginas virtuales, secuencia
 * Cargar: recuperar el estado y ejecutar escenarios predefinidos
-* Esto completa el requisito de “Persistencia”.
+* Esto completa el requisito de "Persistencia".
 
 ### ✅ Multi-proceso real
 
@@ -379,13 +370,3 @@ Enfocado en aprendizaje visual y práctico del manejo de memoria virtual y pagin
 ## 📝 Licencia
 
 Definir según requerimiento del curso o institución (MIT / GPL / uso académico).
-
-```
-
----
-
-Si querés, también puedo:
-- adaptarlo al formato que pida tu profe (con “Objetivo general / específicos”, “Alcance”, “Limitaciones”, etc.)
-- agregarte una sección **“Cómo explicar en la exposición”** y “Preguntas típicas del docente” (eso te sube nota sin tocar código).
-::contentReference[oaicite:0]{index=0}
-```
