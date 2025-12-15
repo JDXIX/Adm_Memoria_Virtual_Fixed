@@ -1,4 +1,5 @@
 
+---
 
 ```md
 # 🖥️ Administrador de Memoria Virtual (Visual) — Patrón MVC (PyQt6)
