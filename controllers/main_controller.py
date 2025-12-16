@@ -4,10 +4,12 @@ Conecta el modelo con la vista
 """
 
 from PyQt6.QtCore import QTimer
-from PyQt6.QtWidgets import QMessageBox
+from PyQt6.QtWidgets import QMessageBox, QFileDialog
 
 from models import (Simulador, Proceso, FIFO, LRU, NRU, CLOCK, OPT)
 from views import MainView
+from utils import guardar_escenario, cargar_escenario
+
 
 class MainController:
     """Controlador principal que gestiona la aplicación"""
@@ -56,26 +58,26 @@ class MainController:
         controles['btn_paso'].clicked.connect(self.ejecutar_paso_manual)
         controles['btn_pausa'].clicked.connect(self.pausar_simulacion)
         controles['btn_reset'].clicked.connect(self.resetear_simulacion)
+
+        # JSON
+        controles['btn_guardar_json'].clicked.connect(self.guardar_escenario_json)
+        controles['btn_cargar_json'].clicked.connect(self.cargar_escenario_json)
     
     def inicializar_modelo(self):
         """Inicializa el modelo de datos"""
         num_marcos = self.vista.obtener_spin_marcos().value()
         algoritmo = self.obtener_algoritmo()
         
-        # Crear simulador
         self.simulador = Simulador(num_marcos, algoritmo)
         
-        # Crear proceso por defecto
         sim_view = self.vista.obtener_simulacion_view()
         num_paginas = sim_view.obtener_controles()['spin_paginas'].value()
         self.proceso_actual = Proceso(1, num_paginas, "#3498db")
         self.simulador.agregar_proceso(self.proceso_actual)
         
-        # Crear marcos en la vista
         memoria_view = self.vista.obtener_memoria_view()
         memoria_view.crear_marcos(num_marcos)
         
-        # Actualizar combo de procesos
         tabla_view = self.vista.obtener_tabla_view()
         tabla_view.actualizar_combo_procesos(self.simulador.procesos)
     
@@ -94,22 +96,19 @@ class MainController:
     # ========== ACTUALIZACIÓN DE VISTA ==========
     
     def actualizar_vista_completa(self):
-        """Actualiza toda la vista con datos del modelo"""
         self.actualizar_memoria()
         self.actualizar_tabla_paginas()
         self.actualizar_estadisticas()
     
     def actualizar_memoria(self):
-        """Actualiza la visualización de la memoria"""
         estado = self.simulador.memoria.obtener_estado_completo()
-        memoria_view = self.vista.obtener_memoria_view()
-        memoria_view.actualizar_marcos(estado, self.simulador.procesos)
+        self.vista.obtener_memoria_view().actualizar_marcos(
+            estado, self.simulador.procesos
+        )
     
     def actualizar_tabla_paginas(self):
-        """Actualiza la tabla de páginas"""
         tabla_view = self.vista.obtener_tabla_view()
-        combo = tabla_view.obtener_combo_proceso()
-        proceso_id = combo.currentData()
+        proceso_id = tabla_view.obtener_combo_proceso().currentData()
         
         if proceso_id in self.simulador.procesos:
             proceso = self.simulador.procesos[proceso_id]
@@ -117,63 +116,48 @@ class MainController:
             tabla_view.actualizar_tabla(entradas, proceso.id)
     
     def actualizar_estadisticas(self):
-        """Actualiza las estadísticas"""
         stats = self.simulador.obtener_estadisticas()
-        sim_view = self.vista.obtener_simulacion_view()
-        sim_view.actualizar_estadisticas(stats)
+        self.vista.obtener_simulacion_view().actualizar_estadisticas(stats)
     
-    # ========== EVENTOS DE CONFIGURACIÓN ==========
+    # ========== EVENTOS CONFIG ==========
     
     def on_config_changed(self):
-        """Evento cuando cambia la configuración"""
         if not self.ejecutando:
             self.inicializar_modelo()
             self.actualizar_vista_completa()
     
     def on_algoritmo_changed(self):
-        """Evento cuando cambia el algoritmo"""
         if self.simulador and not self.ejecutando:
             self.simulador.algoritmo = self.obtener_algoritmo()
     
     def on_proceso_seleccionado(self):
-        """Evento cuando se selecciona un proceso"""
         self.actualizar_tabla_paginas()
     
-    # ========== EVENTOS DE SECUENCIA ==========
+    # ========== SECUENCIAS ==========
     
     def generar_secuencia(self):
-        """Genera una secuencia aleatoria de accesos"""
         if self.ejecutando:
             return
         
-        longitud = 20
-        self.proceso_actual.generar_secuencia_aleatoria(longitud)
-        
-        # Mostrar en el campo de texto
-        sim_view = self.vista.obtener_simulacion_view()
-        controles = sim_view.obtener_controles()
-        secuencia_str = ",".join(map(str, self.proceso_actual.secuencia_accesos))
-        controles['txt_secuencia'].setText(secuencia_str)
-        
+        self.proceso_actual.generar_secuencia_aleatoria(20)
+        controles = self.vista.obtener_simulacion_view().obtener_controles()
+        sec = ",".join(map(str, self.proceso_actual.secuencia_accesos))
+        controles['txt_secuencia'].setText(sec)
         controles['log'].agregar_evento(
-            f"Secuencia aleatoria generada: {secuencia_str[:50]}...",
-            "INFO"
+            f"Secuencia aleatoria generada: {sec[:50]}...", "INFO"
         )
     
     def cargar_secuencia(self):
-        """Carga una secuencia manual"""
         if self.ejecutando:
             return
         
-        sim_view = self.vista.obtener_simulacion_view()
-        controles = sim_view.obtener_controles()
+        controles = self.vista.obtener_simulacion_view().obtener_controles()
         texto = controles['txt_secuencia'].text().strip()
         
         if not texto:
             QMessageBox.warning(
-                self.vista,
-                "Advertencia",
-                "Por favor ingrese una secuencia de números separados por comas"
+                self.vista, "Advertencia",
+                "Ingrese una secuencia separada por comas"
             )
             return
         
@@ -182,118 +166,126 @@ class MainController:
             max_pagina = self.proceso_actual.num_paginas_virtuales - 1
             
             if any(p < 0 or p > max_pagina for p in secuencia):
-                QMessageBox.warning(
-                    self.vista,
-                    "Error",
-                    f"Los números de página deben estar entre 0 y {max_pagina}"
-                )
-                return
+                raise ValueError
             
             self.proceso_actual.establecer_secuencia(secuencia)
             controles['log'].agregar_evento(
-                f"Secuencia cargada: {len(secuencia)} accesos",
-                "INFO"
+                f"Secuencia cargada: {len(secuencia)} accesos", "INFO"
             )
-            
         except ValueError:
             QMessageBox.warning(
-                self.vista,
-                "Error",
-                "Formato inválido. Use números separados por comas (Ej: 1,2,3,4)"
+                self.vista, "Error",
+                f"Páginas deben estar entre 0 y {max_pagina}"
             )
     
-    # ========== EVENTOS DE SIMULACIÓN ==========
+    # ========== SIMULACIÓN ==========
     
     def iniciar_simulacion(self):
-        """Inicia la simulación automática"""
         if not self.proceso_actual.secuencia_accesos:
             QMessageBox.warning(
-                self.vista,
-                "Advertencia",
-                "Primero genere o cargue una secuencia de accesos"
+                self.vista, "Advertencia",
+                "Primero genere o cargue una secuencia"
             )
             return
         
         self.ejecutando = True
-        
-        sim_view = self.vista.obtener_simulacion_view()
-        controles = sim_view.obtener_controles()
+        controles = self.vista.obtener_simulacion_view().obtener_controles()
         
         controles['btn_ejecutar'].setEnabled(False)
         controles['btn_pausa'].setEnabled(True)
         controles['btn_paso'].setEnabled(False)
         
-        # Configurar velocidad del timer
-        velocidad = self.vista.obtener_slider_velocidad().value()
-        intervalo = int(2000 / velocidad)
+        intervalo = int(2000 / self.vista.obtener_slider_velocidad().value())
         self.timer.start(intervalo)
         
         controles['log'].agregar_evento("🚀 Simulación iniciada", "INFO")
     
     def pausar_simulacion(self):
-        """Pausa la simulación"""
         self.ejecutando = False
         self.timer.stop()
         
-        sim_view = self.vista.obtener_simulacion_view()
-        controles = sim_view.obtener_controles()
-        
+        controles = self.vista.obtener_simulacion_view().obtener_controles()
         controles['btn_ejecutar'].setEnabled(True)
         controles['btn_pausa'].setEnabled(False)
         controles['btn_paso'].setEnabled(True)
-        
         controles['log'].agregar_evento("⏸️ Simulación pausada", "INFO")
     
     def ejecutar_paso_automatico(self):
-        """Ejecuta un paso automático de la simulación"""
         self.ejecutar_paso_manual()
     
     def ejecutar_paso_manual(self):
-        """Ejecuta un paso manual de la simulación"""
         if not self.proceso_actual.tiene_mas_accesos():
             if self.ejecutando:
                 self.pausar_simulacion()
-            
-            sim_view = self.vista.obtener_simulacion_view()
-            controles = sim_view.obtener_controles()
-            controles['log'].agregar_evento("✅ Simulación completada", "INFO")
+            self.vista.obtener_simulacion_view().obtener_controles()['log'] \
+                .agregar_evento("✅ Simulación completada", "INFO")
             return
         
-        # Ejecutar paso en el modelo
         evento = self.simulador.ejecutar_paso()
         
         if evento:
-            # Resaltar marco involucrado en la vista
             if evento.marco is not None:
                 memoria_view = self.vista.obtener_memoria_view()
                 memoria_view.resaltar_marco(evento.marco, True)
-                QTimer.singleShot(500, 
-                    lambda: memoria_view.resaltar_marco(evento.marco, False))
+                QTimer.singleShot(
+                    500,
+                    lambda: memoria_view.resaltar_marco(evento.marco, False)
+                )
             
-            # Agregar al log
-            sim_view = self.vista.obtener_simulacion_view()
-            controles = sim_view.obtener_controles()
+            controles = self.vista.obtener_simulacion_view().obtener_controles()
             controles['log'].agregar_evento(evento.mensaje, evento.tipo)
-            
-            # Actualizar toda la vista
             self.actualizar_vista_completa()
     
     def resetear_simulacion(self):
-        """Resetea la simulación"""
         if self.ejecutando:
             self.pausar_simulacion()
         
-        # Resetear modelo
         self.simulador.resetear()
         self.proceso_actual.resetear_estadisticas()
-        
-        # Actualizar vista
         self.actualizar_vista_completa()
         
-        sim_view = self.vista.obtener_simulacion_view()
-        controles = sim_view.obtener_controles()
+        controles = self.vista.obtener_simulacion_view().obtener_controles()
         controles['log'].limpiar()
         controles['log'].agregar_evento("🔄 Simulación reseteada", "INFO")
         
         controles['btn_ejecutar'].setEnabled(True)
         controles['btn_paso'].setEnabled(True)
+    
+    # ========== JSON ==========
+    
+    def guardar_escenario_json(self):
+        ruta, _ = QFileDialog.getSaveFileName(
+            self.vista, "Guardar escenario", "", "JSON (*.json)"
+        )
+        if not ruta:
+            return
+        
+        datos = {
+            "marcos_fisicos": self.vista.obtener_spin_marcos().value(),
+            "algoritmo": self.vista.obtener_combo_algoritmo().currentText(),
+            "paginas_virtuales": self.proceso_actual.num_paginas_virtuales,
+            "secuencia": self.proceso_actual.secuencia_accesos
+        }
+        
+        guardar_escenario(ruta, datos)
+        self.vista.obtener_simulacion_view().obtener_controles()['log'] \
+            .agregar_evento("💾 Escenario guardado en JSON", "INFO")
+    
+    def cargar_escenario_json(self):
+        ruta, _ = QFileDialog.getOpenFileName(
+            self.vista, "Cargar escenario", "", "JSON (*.json)"
+        )
+        if not ruta:
+            return
+        
+        datos = cargar_escenario(ruta)
+        
+        self.vista.obtener_spin_marcos().setValue(datos["marcos_fisicos"])
+        self.vista.obtener_combo_algoritmo().setCurrentText(datos["algoritmo"])
+        self.proceso_actual.num_paginas_virtuales = datos["paginas_virtuales"]
+        self.proceso_actual.establecer_secuencia(datos["secuencia"])
+        
+        self.actualizar_vista_completa()
+        
+        self.vista.obtener_simulacion_view().obtener_controles()['log'] \
+            .agregar_evento("📂 Escenario cargado desde JSON", "INFO")

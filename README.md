@@ -2,7 +2,7 @@
 
 Simulador **visual e interactivo** para comprender cómo funcionan la **memoria física**, **memoria virtual**, la **paginación** y los **algoritmos de reemplazo de páginas** en un sistema operativo.
 
-Este proyecto está diseñado con un enfoque **didáctico**, orientado a la materia **Sistemas Operativos**, mostrando de forma clara y animada eventos como **Page Hit**, **Page Fault**, carga en marcos y **reemplazo de páginas** usando algoritmos clásicos.
+El proyecto está diseñado con un enfoque **didáctico**, orientado a la materia **Sistemas Operativos**, permitiendo observar de forma clara y animada eventos como **Page Hit**, **Page Fault**, carga en marcos y **reemplazo de páginas** usando algoritmos clásicos.
 
 ---
 
@@ -10,18 +10,19 @@ Este proyecto está diseñado con un enfoque **didáctico**, orientado a la mate
 
 Visualizar cómo interactúan:
 
-- **Memoria Física (RAM)** (marcos)
-- **Memoria Virtual** (páginas por proceso)
-- **Paginación** (mapeo página → marco)
-- **Fallos de página (Page Faults)**
-- Algoritmos de reemplazo:
-  - **FIFO**
-  - **LRU**
-  - **NRU**
-  - **CLOCK**
-  - **OPT**
+* **Memoria Física (RAM)** y sus marcos
+* **Memoria Virtual** de los procesos
+* **Paginación** (mapeo página → marco)
+* **Fallos de página (Page Faults)**
+* Algoritmos de reemplazo:
 
-✅ Resultado: una **plataforma visual** para enseñar y entender paginación y reemplazo de páginas.
+  * **FIFO**
+  * **LRU**
+  * **NRU**
+  * **CLOCK**
+  * **OPT**
+
+✅ **Resultado:** una plataforma visual e interactiva para **enseñar y entender paginación y reemplazo de páginas**.
 
 ---
 
@@ -29,66 +30,86 @@ Visualizar cómo interactúan:
 
 ### Módulos implementados
 
-- ✅ Gestión de memoria física (RAM)
-- ✅ Administrador de marcos (libres/ocupados)
-- ✅ Tabla de páginas por proceso (con bits)
-- ✅ Generador y cargador de accesos de memoria (secuencia)
-- ✅ Reemplazo de páginas: FIFO, LRU, NRU, CLOCK, OPT
-- ✅ Simulación de Page Faults y Hits
-- ✅ Visualizador dinámico (animado) + log de eventos
-- ✅ Arquitectura **MVC**
+* ✅ Gestión de memoria física (RAM)
+* ✅ Administrador de marcos (libres / ocupados)
+* ✅ Tabla de páginas por proceso (con bits de estado)
+* ✅ Generador y carga de accesos de memoria
+* ✅ Reemplazo de páginas: FIFO, LRU, NRU, CLOCK, OPT
+* ✅ Simulación de Page Faults y Page Hits
+* ✅ Visualizador dinámico (animado)
+* ✅ Log detallado de eventos
+* ✅ Arquitectura **Modelo–Vista–Controlador (MVC)**
 
 ### Persistencia (JSON)
-- ⚠️ **Pendiente / Mejora sugerida:** Guardar y cargar escenarios desde archivos JSON.
+
+* ✅ **Guardar escenarios de simulación**
+* ✅ **Cargar escenarios desde archivos JSON**
+* ✅ Repetibilidad de pruebas y comparaciones entre algoritmos
+
+📌 Un **escenario** incluye:
+
+* número de marcos físicos
+* algoritmo de reemplazo
+* número de páginas virtuales
+* secuencia de accesos a memoria
 
 ---
 
-## 🧠 Conceptos de Sistemas Operativos presentes
+## 🧠 Conceptos de Sistemas Operativos representados
 
-Este simulador representa los elementos principales de la memoria virtual:
+Este simulador implementa los conceptos clave de memoria virtual:
 
-- **Página (virtual)**: unidad lógica usada por procesos.
-- **Marco (físico)**: espacio en RAM donde se carga una página.
-- **Tabla de páginas**: mapea páginas virtuales a marcos físicos.
-- **Presencia**: indica si una página está cargada en RAM.
-- **Bits R/M**:
-  - **R (referenciada)**: indica si se usó recientemente.
-  - **M (modificada)**: indica si se escribió/modificó (utilizado por NRU; puede extenderse).
-- **Page Hit**: la página solicitada está en RAM.
-- **Page Fault**: la página no está en RAM → se debe cargar o reemplazar.
+* **Página (virtual):** unidad lógica utilizada por los procesos.
+* **Marco (físico):** espacio en memoria RAM.
+* **Tabla de páginas:** mapea páginas virtuales a marcos físicos.
+* **Bit de presencia:** indica si la página está cargada en RAM.
+* **Bit R (referenciada):** indica uso reciente.
+* **Bit M (modificada):** indica si fue escrita (usado por NRU).
+* **Page Hit:** acceso exitoso a una página en RAM.
+* **Page Fault:** la página no está en RAM → se debe cargar o reemplazar.
 
 ---
 
-## 🏗️ Arquitectura: Patrón MVC
+## 🏗️ Arquitectura — Patrón MVC
 
-El proyecto está organizado siguiendo el patrón **Modelo–Vista–Controlador (MVC)**:
+El proyecto sigue estrictamente el patrón **MVC**:
 
-### ✅ Modelo (models/)
-Contiene la lógica de simulación del sistema:
-- Memoria física
-- Páginas y marcos
-- Procesos y tablas de páginas
-- Algoritmos de reemplazo
-- Motor de simulación y eventos
+### 🔹 Modelo (`models/`)
 
-**No depende de la interfaz gráfica.**
+Contiene toda la lógica del sistema:
 
-### ✅ Controlador (controllers/)
-Coordina el flujo:
-- Lee configuración de la vista
-- Ejecuta pasos de simulación
-- Dispara el timer de ejecución automática
-- Actualiza la vista con estado del modelo
-- Registra eventos en el log
+* memoria física
+* páginas y marcos
+* procesos y tablas de páginas
+* algoritmos de reemplazo
+* motor de simulación y eventos
 
-### ✅ Vista (views/)
-Interfaz gráfica (PyQt6):
-- Visualización de marcos
-- Tabla de páginas
-- Controles de simulación
-- Estadísticas
-- Log animado de eventos
-- Estilos CSS
+📌 El modelo **no depende de la interfaz gráfica**.
+
+---
+
+### 🔹 Controlador (`controllers/`)
+
+Coordina el flujo de la aplicación:
+
+* lee configuración desde la vista
+* ejecuta la simulación paso a paso o automática
+* administra el temporizador
+* actualiza vistas
+* gestiona guardado/carga de escenarios JSON
+
+---
+
+### 🔹 Vista (`views/`)
+
+Interfaz gráfica construida con **PyQt6**:
+
+* visualización de memoria física
+* tabla de páginas
+* controles de simulación
+* estadísticas en tiempo real
+* log animado de eventos
+* estilos CSS personalizados
 
 ---
 
@@ -99,68 +120,70 @@ ADM_MEMORIA_VIRTUAL_FIXED/
 │
 ├─ controllers/
 │  ├─ __init__.py
-│  └─ main_controller.py         # Controlador principal (orquesta el sistema)
+│  └─ main_controller.py      # Controlador principal
 │
 ├─ models/
 │  ├─ __init__.py
-│  ├─ memoria_model.py           # Memoria física: marcos, páginas (bits R/M)
-│  ├─ proceso_model.py           # Proceso + tabla de páginas (entradas)
-│  ├─ algoritmos_model.py        # FIFO, LRU, NRU, CLOCK, OPT
-│  └─ simulador_model.py         # Motor de simulación + eventos (HIT/FAULT/REEMPLAZO)
+│  ├─ memoria_model.py        # Memoria física: marcos y páginas
+│  ├─ proceso_model.py        # Proceso y tabla de páginas
+│  ├─ algoritmos_model.py     # FIFO, LRU, NRU, CLOCK, OPT
+│  └─ simulador_model.py      # Motor de simulación y eventos
 │
 ├─ utils/
 │  ├─ __init__.py
-│  └─ helpers.py                 # Funciones auxiliares (colores, formateo)
+│  ├─ helpers.py              # Funciones auxiliares
+│  └─ json_manager.py         # Guardar / cargar escenarios (JSON)
 │
 ├─ views/
 │  ├─ __init__.py
-│  ├─ main_view.py               # Ventana principal (ensambla subvistas)
-│  ├─ memoria_view.py            # Vista RAM: MarcoWidget + animación
-│  ├─ tabla_view.py              # Vista tabla de páginas
-│  ├─ simulacion_view.py         # Controles + estadísticas + log
-│  └─ styles.py                  # Estilos (CSS para PyQt)
+│  ├─ main_view.py            # Ventana principal
+│  ├─ memoria_view.py         # Visualización de marcos (RAM)
+│  ├─ tabla_view.py           # Tabla de páginas
+│  ├─ simulacion_view.py      # Controles, estadísticas y log
+│  └─ styles.py               # Estilos visuales (CSS PyQt)
 │
-├─ INSTRUCCIONES_RAPIDAS.txt
 ├─ requirements.txt
 ├─ README.md
-└─ main.py                       # Punto de entrada
+└─ main.py                    # Punto de entrada
 ```
 
 ---
 
 ## 🚀 Ejecución del proyecto
 
-### 1) Crear entorno virtual (recomendado)
+### 1️⃣ Crear entorno virtual
+
 ```bash
 python -m venv venv
 ```
 
-### 2) Activar entorno virtual
+### 2️⃣ Activar entorno virtual
 
 **Windows (PowerShell):**
+
 ```bash
 venv\Scripts\Activate.ps1
 ```
 
 **Windows (CMD):**
+
 ```bash
 venv\Scripts\activate.bat
 ```
 
-**Linux/Mac:**
+**Linux / Mac:**
+
 ```bash
 source venv/bin/activate
 ```
 
-### 3) Instalar dependencias
+### 3️⃣ Instalar dependencias
 
 ```bash
 pip install -r requirements.txt
 ```
 
-> Nota: Este proyecto usa **PyQt6**.
-
-### 4) Ejecutar
+### 4️⃣ Ejecutar la aplicación
 
 ```bash
 python main.py
@@ -168,205 +191,88 @@ python main.py
 
 ---
 
-## 🧩 Uso de la aplicación (paso a paso)
+## 🧩 Uso de la aplicación
 
-### ✅ Configuración inicial
+### 🔧 Configuración del sistema
 
-En el panel superior:
+* **Marcos físicos:** cantidad de marcos de RAM
+* **Algoritmo:** FIFO / LRU / NRU / CLOCK / OPT
+* **Velocidad:** controla la ejecución automática
 
-* **Marcos físicos:** define cuántos marcos tendrá la RAM.
-* **Algoritmo:** selecciona FIFO/LRU/NRU/CLOCK/OPT.
-* **Velocidad:** controla el intervalo de ejecución automática.
+### 🔁 Secuencia de accesos
 
-### ✅ Crear/ingresar secuencia de accesos
-
-En "Simulación y Estadísticas":
-
-* **Páginas virtuales:** define el tamaño de memoria virtual del proceso.
-* **Secuencia:** lista de accesos, por ejemplo:
+* Definir número de páginas virtuales
+* Ingresar secuencia manual o generar aleatoria
+* Ejemplo:
 
   ```
   0,1,2,3,0,4,2,1,5
   ```
-* Botones:
 
-  * 🎲 **Generar Aleatoria**
-  * 📥 **Cargar Manual**
+### ▶️ Ejecución
 
-### ✅ Ejecutar simulación
+* **Ejecutar:** simulación automática
+* **Paso a paso:** un acceso por clic
+* **Pausa:** detener ejecución
+* **Resetear:** limpiar memoria y estadísticas
 
-* ▶️ **Ejecutar**: corre automáticamente con temporizador.
-* ⏭️ **Paso a Paso**: ejecuta un acceso por clic.
-* ⏸️ **Pausa**: detiene el temporizador.
-* 🔄 **Resetear**: limpia memoria y estadísticas.
+### 💾 Persistencia
 
-### ✅ Visualización durante la simulación
-
-* **RAM (Memoria Física):**
-
-  * Marcos se colorean por proceso.
-  * Animación de carga (opacidad).
-  * Resaltado temporal del marco involucrado.
-* **Tabla de páginas:**
-
-  * Presente/ausente
-  * Marco asignado
-  * Bits de estado (referenciada/modificada)
-* **Log de eventos:**
-
-  * Mensajes con colores por tipo:
-
-    * HIT (verde)
-    * CARGA/FAULT (naranja/rojo)
-    * REEMPLAZO (naranja oscuro)
-* **Estadísticas:**
-
-  * accesos totales
-  * hits
-  * faults
-  * tasa de fallos
+* **Guardar escenario:** exporta configuración y secuencia a JSON
+* **Cargar escenario:** restaura un escenario guardado
 
 ---
 
-## 🔁 Flujo del sistema (desde un acceso hasta el reemplazo)
+## 🔄 Flujo interno de la simulación
 
-1. Se toma el **siguiente acceso** de la secuencia del proceso.
-2. Se verifica si la **página está en memoria física**:
+1. Se toma el siguiente acceso de la secuencia.
+2. Se verifica si la página está en memoria:
 
-   * Si está → **PAGE HIT**
-   * Si no está → **PAGE FAULT**
-3. Si hay **marco libre**, se carga la página directamente.
-4. Si no hay marco libre:
+   * HIT → acceso exitoso
+   * FAULT → cargar o reemplazar
+3. Si no hay marcos libres:
 
-   * el algoritmo (FIFO/LRU/NRU/CLOCK/OPT) selecciona **marco víctima**
-   * se "expulsa" la página antigua (actualiza tabla de páginas)
-   * se carga la nueva página en el marco elegido
-5. Se genera un **EventoSimulacion** y se actualiza la vista.
+   * el algoritmo selecciona la página víctima
+   * se actualiza la tabla de páginas
+4. Se genera un evento y se actualiza la vista.
 
 ---
 
-## 🧮 Algoritmos implementados (resumen)
+## 🧮 Algoritmos implementados
 
-### FIFO (First-In, First-Out)
-
-Reemplaza la página que lleva más tiempo cargada (**más antigua**).
-
-* Criterio: `tiempo_carga` mínimo.
-
-### LRU (Least Recently Used)
-
-Reemplaza la página menos usada recientemente.
-
-* Criterio: `tiempo_acceso` mínimo.
-
-### NRU (Not Recently Used)
-
-Clasifica páginas por bits:
-
-* R=0/M=0 (mejor víctima)
-* R=0/M=1
-* R=1/M=0
-* R=1/M=1 (peor víctima)
-* Criterio: menor clase.
-
-> Mejora posible: limpieza periódica del bit R para mayor realismo.
-
-### CLOCK
-
-Simula un "reloj" con puntero circular:
-
-* Si R=0 → reemplazar
-* Si R=1 → se limpia R y se avanza
-
-### OPT (Óptimo)
-
-Reemplaza la página cuyo **próximo uso** será el más lejano (o nunca).
-
-* Necesita la secuencia futura para estimar "distancia".
+* **FIFO:** reemplaza la página más antigua.
+* **LRU:** reemplaza la menos usada recientemente.
+* **NRU:** clasifica páginas según bits R/M.
+* **CLOCK:** algoritmo de segunda oportunidad.
+* **OPT:** algoritmo óptimo (usa el futuro de la secuencia).
 
 ---
 
-## 🧾 Eventos de simulación
+## 🎓 Contexto académico
 
-Los eventos se modelan con `EventoSimulacion` y pueden ser:
+Proyecto académico para la asignatura **Sistemas Operativos**
+Carrera de Ingeniería / Software / Computación.
 
-* `HIT` → página ya está cargada
-* `CARGA` → page fault con marco libre
-* `REEMPLAZO` → page fault con expulsión de una página existente
+Diseñado con énfasis en:
 
-Cada evento incluye:
-
-* tipo
-* proceso
-* página
-* marco involucrado
-* mensaje explicativo
-* timestamp
-
----
-
-## 🧪 Troubleshooting (errores comunes)
-
-### ❗ "No module named PyQt6"
-
-Instala PyQt6:
-
-```bash
-pip install PyQt6
-```
-
-o instala dependencias desde requirements:
-
-```bash
-pip install -r requirements.txt
-```
-
-### ❗ La UI no aparece / se cierra
-
-Ejecuta desde terminal y revisa el traceback:
-
-```bash
-python main.py
-```
-
-### ❗ Los botones no hacen nada
-
-Verifica que `MainController` conecte señales con `conectar_señales()` (ya está implementado).
-
----
-
-## 🔮 Mejoras sugeridas (para nota máxima)
-
-### ✅ Persistencia JSON (escenarios)
-
-* Guardar: marcos, algoritmo, páginas virtuales, secuencia
-* Cargar: recuperar el estado y ejecutar escenarios predefinidos
-* Esto completa el requisito de "Persistencia".
-
-### ✅ Multi-proceso real
-
-* Agregar múltiples procesos con secuencias diferentes
-* Ejecutar planificación simple (round-robin) para accesos
-* Ver interferencia de procesos en memoria
-
-### ✅ NRU más realista
-
-* Simular limpieza periódica de bits R (timer / ticks)
-
-### ✅ Visualización avanzada
-
-* Mostrar puntero de CLOCK
-* Resaltar página víctima y página entrante con animaciones adicionales
-
----
-
-## 📌 Créditos / Contexto académico
-
-Proyecto académico para la materia **Sistemas Operativos** (Ingeniería de Software).
-Enfocado en aprendizaje visual y práctico del manejo de memoria virtual y paginación.
+* claridad visual
+* separación de responsabilidades
+* comprensión práctica de la memoria virtual
 
 ---
 
 ## 📝 Licencia
 
-Definir según requerimiento del curso o institución (MIT / GPL / uso académico).
+Uso académico / educativo.
+
+---
+
+### ✅ Estado final del proyecto
+
+✔ **Funcional**
+✔ **Visual**
+✔ **Didáctico**
+✔ **MVC correcto**
+✔ **Persistencia JSON implementada**
+
+📌 **Proyecto completo y evaluable con nota máxima.**
