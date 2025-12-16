@@ -62,7 +62,7 @@ class TablaView(QWidget):
                 gridline-color: #dcdde1;
             }
             QTableWidget::item {
-                padding: 6px;
+                padding: 10px;
             }
             QTableWidget::item:selected {
                 background-color: #d6eaf8;
