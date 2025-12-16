@@ -67,49 +67,74 @@ class MainView(QMainWindow):
         main_layout.addWidget(self.simulacion_view)
         
     def crear_panel_configuracion(self):
-        """Crea el panel de configuración"""
+        """Crea el panel de configuración del sistema"""
         group = QGroupBox("⚙️ Configuración del Sistema")
+
         layout = QHBoxLayout()
-        
-        # Número de marcos
-        layout.addWidget(QLabel("Marcos físicos:"))
+        layout.setSpacing(40)
+
+        # ===== Bloque: Marcos Físicos =====
+        marcos_layout = QVBoxLayout()
+        lbl_marcos = QLabel("Marcos Físicos (RAM)")
+        lbl_marcos.setStyleSheet("font-weight: bold;")
+        marcos_layout.addWidget(lbl_marcos)
+
         self.spin_marcos = QSpinBox()
         self.spin_marcos.setMinimum(3)
         self.spin_marcos.setMaximum(16)
         self.spin_marcos.setValue(8)
-        layout.addWidget(self.spin_marcos)
-        
-        layout.addWidget(QLabel("   "))
-        
-        # Algoritmo de reemplazo
-        layout.addWidget(QLabel("Algoritmo:"))
+        self.spin_marcos.setFixedWidth(100)
+        marcos_layout.addWidget(self.spin_marcos)
+
+        marcos_layout.addStretch()
+        layout.addLayout(marcos_layout)
+
+        # ===== Bloque: Algoritmo =====
+        algoritmo_layout = QVBoxLayout()
+        lbl_algoritmo = QLabel("Algoritmo de Reemplazo")
+        lbl_algoritmo.setStyleSheet("font-weight: bold;")
+        algoritmo_layout.addWidget(lbl_algoritmo)
+
         self.combo_algoritmo = QComboBox()
         self.combo_algoritmo.addItems(["FIFO", "LRU", "NRU", "CLOCK", "OPT"])
-        layout.addWidget(self.combo_algoritmo)
-        
-        layout.addWidget(QLabel("   "))
-        
-        # Velocidad de simulación
-        layout.addWidget(QLabel("Velocidad:"))
+        self.combo_algoritmo.setFixedWidth(160)
+        algoritmo_layout.addWidget(self.combo_algoritmo)
+
+        algoritmo_layout.addStretch()
+        layout.addLayout(algoritmo_layout)
+
+        # ===== Bloque: Velocidad =====
+        velocidad_layout = QVBoxLayout()
+        lbl_velocidad = QLabel("Velocidad de Simulación")
+        lbl_velocidad.setStyleSheet("font-weight: bold;")
+        velocidad_layout.addWidget(lbl_velocidad)
+
+        slider_layout = QHBoxLayout()
         self.slider_velocidad = QSlider(Qt.Orientation.Horizontal)
         self.slider_velocidad.setMinimum(1)
         self.slider_velocidad.setMaximum(10)
         self.slider_velocidad.setValue(5)
-        self.slider_velocidad.setFixedWidth(150)
-        layout.addWidget(self.slider_velocidad)
-        
+        self.slider_velocidad.setFixedWidth(180)
+
         self.lbl_velocidad = QLabel("5")
         self.lbl_velocidad.setFixedWidth(30)
+
         self.slider_velocidad.valueChanged.connect(
             lambda v: self.lbl_velocidad.setText(str(v))
         )
-        layout.addWidget(self.lbl_velocidad)
-        
+
+        slider_layout.addWidget(self.slider_velocidad)
+        slider_layout.addWidget(self.lbl_velocidad)
+
+        velocidad_layout.addLayout(slider_layout)
+        velocidad_layout.addStretch()
+        layout.addLayout(velocidad_layout)
+
         layout.addStretch()
-        
         group.setLayout(layout)
         return group
-    
+
+
     # ========== Getters para el controlador ==========
     
     def obtener_spin_marcos(self):

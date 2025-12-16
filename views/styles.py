@@ -21,9 +21,11 @@ def obtener_estilos():
     QGroupBox::title {
         subcontrol-origin: margin;
         subcontrol-position: top left;
-        padding: 5px 10px;
-        color: #2c3e50;
+        padding: 6px 12px;
+        color: #1f2d3d;
+        font-size: 12px;
     }
+
     
     QPushButton {
         background-color: #3498db;
@@ -74,11 +76,18 @@ def obtener_estilos():
     
     QSpinBox, QComboBox, QLineEdit {
         padding: 8px;
-        border: 2px solid #dcdde1;
-        border-radius: 5px;
-        background-color: white;
-        font-size: 10px;
+        border: 2px solid #bfc7d5;
+        border-radius: 6px;
+        background-color: #ffffff;
+        font-size: 11px;
+        color: #2c3e50;
     }
+
+    QSpinBox:hover, QComboBox:hover, QLineEdit:hover {
+        border: 2px solid #3498db;
+        background-color: #f8fbff;
+    }
+
     
     QSpinBox:focus, QComboBox:focus, QLineEdit:focus {
         border: 2px solid #3498db;
@@ -103,12 +112,14 @@ def obtener_estilos():
     }
     
     QTableWidget {
-        background-color: white;
-        alternate-background-color: #f8f9fa;
+        background-color: #ffffff;
+        alternate-background-color: #f2f6fa;
         gridline-color: #dcdde1;
-        border: 1px solid #dcdde1;
-        border-radius: 5px;
+        border: 1px solid #ccd6e0;
+        border-radius: 6px;
+        font-size: 11px;
     }
+
     
     QTableWidget::item {
         padding: 5px;
@@ -120,12 +131,14 @@ def obtener_estilos():
     }
     
     QHeaderView::section {
-        background-color: #34495e;
-        color: white;
-        padding: 8px;
+        background-color: #2c3e50;
+        color: #ffffff;
+        padding: 9px;
         border: none;
         font-weight: bold;
+        font-size: 11px;
     }
+
     
     QTextEdit {
         background-color: #2c3e50;
@@ -133,9 +146,10 @@ def obtener_estilos():
         border: 2px solid #34495e;
         border-radius: 5px;
         font-family: 'Consolas', 'Courier New', monospace;
-        font-size: 10px;
+        font-size: 11px;
         padding: 10px;
     }
+
     
     QLabel#lblEstadistica {
         font-size: 16px;
@@ -150,4 +164,10 @@ def obtener_estilos():
         color: #3498db;
         padding: 5px;
     }
+
+    QLabel {
+        font-size: 11px;
+        color: #2c3e50;
+    }
+        
     """

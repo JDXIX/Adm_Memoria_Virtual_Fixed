@@ -2,10 +2,13 @@
 VISTA: Componentes visuales para simulación y estadísticas
 """
 
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QGroupBox,
-                             QLabel, QPushButton, QSpinBox, QLineEdit,
-                             QSlider, QTextEdit, QComboBox)
+from PyQt6.QtWidgets import (
+    QWidget, QVBoxLayout, QHBoxLayout, QGroupBox,
+    QLabel, QPushButton, QSpinBox, QLineEdit,
+    QSlider, QTextEdit, QComboBox
+)
 from PyQt6.QtCore import Qt
+
 
 class LogWidget(QTextEdit):
     """Widget para el log de eventos"""
@@ -36,6 +39,7 @@ class LogWidget(QTextEdit):
     def limpiar(self):
         """Limpia el log"""
         self.clear()
+
 
 class EstadisticaWidget(QWidget):
     """Widget para mostrar una estadística"""
@@ -68,6 +72,7 @@ class EstadisticaWidget(QWidget):
         """Actualiza el valor mostrado"""
         self.lbl_valor.setText(str(valor))
 
+
 class SimulacionView(QWidget):
     """Vista de simulación y controles"""
     
@@ -85,23 +90,74 @@ class SimulacionView(QWidget):
         # Controles de proceso
         layout_proceso = QHBoxLayout()
         
-        layout_proceso.addWidget(QLabel("Páginas virtuales:"))
+        # ── Páginas virtuales (mejorado visualmente)
+        box_paginas = QGroupBox("📄 Páginas Virtuales")
+        box_paginas.setStyleSheet("""
+            QGroupBox {
+                font-weight: bold;
+                border: 2px solid #dcdde1;
+                border-radius: 8px;
+                padding-top: 12px;
+                background-color: white;
+            }
+        """)
+        box_paginas_layout = QVBoxLayout()
+        
         self.spin_paginas = QSpinBox()
         self.spin_paginas.setMinimum(5)
         self.spin_paginas.setMaximum(50)
         self.spin_paginas.setValue(10)
-        layout_proceso.addWidget(self.spin_paginas)
+        self.spin_paginas.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.spin_paginas.setFixedHeight(36)
+        self.spin_paginas.setToolTip(
+            "Cantidad total de páginas virtuales\n"
+            "que existirán durante la simulación."
+        )
         
-        layout_proceso.addWidget(QLabel("Secuencia:"))
+        box_paginas_layout.addWidget(self.spin_paginas)
+        box_paginas.setLayout(box_paginas_layout)
+        layout_proceso.addWidget(box_paginas)
+        
+        # Secuencia de referencias
+        box_secuencia = QGroupBox("🔁 Secuencia de Referencias")
+        box_secuencia.setStyleSheet("""
+            QGroupBox {
+                font-weight: bold;
+                border: 2px solid #dcdde1;
+                border-radius: 8px;
+                padding-top: 12px;
+                background-color: white;
+            }
+        """)
+        box_seq_layout = QVBoxLayout()
+        
         self.txt_secuencia = QLineEdit()
-        self.txt_secuencia.setPlaceholderText("Ej: 1,2,3,4,1,2,5...")
-        self.txt_secuencia.setFixedWidth(200)
-        layout_proceso.addWidget(self.txt_secuencia)
+        self.txt_secuencia.setPlaceholderText("Ejemplo: 1,2,3,4,1,2,5")
+        self.txt_secuencia.setFixedHeight(36)
+        self.txt_secuencia.setToolTip(
+            "Secuencia de páginas a acceder.\n"
+            "Separadas por comas."
+        )
         
-        self.btn_generar = QPushButton("🎲 Generar Aleatoria")
+        box_seq_layout.addWidget(self.txt_secuencia)
+        box_secuencia.setLayout(box_seq_layout)
+        layout_proceso.addWidget(box_secuencia)
+        
+        # Botones de carga
+        self.btn_generar = QPushButton("🎲 Generar secuencia aleatoria")
+        self.btn_generar.setFixedHeight(36)
+        self.btn_generar.setToolTip(
+            "Genera automáticamente una secuencia\n"
+            "de páginas basada en el número definido."
+        )
         layout_proceso.addWidget(self.btn_generar)
         
-        self.btn_cargar = QPushButton("📥 Cargar Manual")
+        self.btn_cargar = QPushButton("📥 Cargar secuencia manual")
+        self.btn_cargar.setFixedHeight(36)
+        self.btn_cargar.setToolTip(
+            "Utiliza la secuencia ingresada manualmente\n"
+            "en el campo de texto."
+        )
         layout_proceso.addWidget(self.btn_cargar)
         
         layout_proceso.addStretch()
@@ -110,20 +166,37 @@ class SimulacionView(QWidget):
         # Botones de control
         layout_controles = QHBoxLayout()
         
-        self.btn_ejecutar = QPushButton("▶️ Ejecutar")
+        self.btn_ejecutar = QPushButton("▶️ Ejecutar simulación")
         self.btn_ejecutar.setObjectName("btnEjecutar")
+        self.btn_ejecutar.setFixedHeight(36)
+        self.btn_ejecutar.setToolTip(
+            "Ejecuta la simulación completa utilizando\n"
+            "la configuración actual."
+        )
         layout_controles.addWidget(self.btn_ejecutar)
         
-        self.btn_paso = QPushButton("⏭️ Paso a Paso")
+        self.btn_paso = QPushButton("⏭️ Ejecutar paso a paso")
+        self.btn_paso.setFixedHeight(36)
+        self.btn_paso.setToolTip(
+            "Ejecuta la simulación un acceso a la vez."
+        )
         layout_controles.addWidget(self.btn_paso)
         
-        self.btn_pausa = QPushButton("⏸️ Pausa")
+        self.btn_pausa = QPushButton("⏸️ Pausar simulación")
         self.btn_pausa.setObjectName("btnPausa")
         self.btn_pausa.setEnabled(False)
+        self.btn_pausa.setFixedHeight(36)
+        self.btn_pausa.setToolTip(
+            "Pausa temporalmente la simulación."
+        )
         layout_controles.addWidget(self.btn_pausa)
         
-        self.btn_reset = QPushButton("🔄 Resetear")
+        self.btn_reset = QPushButton("🔄 Reiniciar simulación")
         self.btn_reset.setObjectName("btnReset")
+        self.btn_reset.setFixedHeight(36)
+        self.btn_reset.setToolTip(
+            "Reinicia la simulación y limpia todo."
+        )
         layout_controles.addWidget(self.btn_reset)
         
         layout_controles.addStretch()
@@ -135,10 +208,10 @@ class SimulacionView(QWidget):
         self.stat_accesos = EstadisticaWidget("Accesos Totales", "0")
         layout_stats.addWidget(self.stat_accesos)
         
-        self.stat_faults = EstadisticaWidget("Page Faults", "0")
+        self.stat_faults = EstadisticaWidget("Fallos de Página", "0")
         layout_stats.addWidget(self.stat_faults)
         
-        self.stat_hits = EstadisticaWidget("Page Hits", "0")
+        self.stat_hits = EstadisticaWidget("Aciertos de Página", "0")
         layout_stats.addWidget(self.stat_hits)
         
         self.stat_tasa = EstadisticaWidget("Tasa de Fallos", "0.00%")
@@ -147,8 +220,14 @@ class SimulacionView(QWidget):
         group_layout.addLayout(layout_stats)
         
         # Log de eventos
-        group_layout.addWidget(QLabel("📝 Log de Eventos:"))
+        lbl_log = QLabel("📝 Log de eventos de la simulación:")
+        group_layout.addWidget(lbl_log)
+        
         self.log_widget = LogWidget()
+        self.log_widget.setToolTip(
+            "Muestra en tiempo real los eventos\n"
+            "de carga, fallo, reemplazo y aciertos."
+        )
         group_layout.addWidget(self.log_widget)
         
         group.setLayout(group_layout)
